@@ -1,0 +1,122 @@
+# install packages
+install.packages('dplyr')
+
+# load package
+library('dplyr')
+
+
+# setting working directory
+setwd("D:/R_Session_Hyd/")
+
+#retriving working directory
+getwd()
+
+#read CSV in r
+mydata <- read.csv("batting_data_cric_info_v2.csv", header = TRUE)
+
+# check the first record
+mydata[1, ]
+
+
+# check first 5 records
+head(mydata,5)
+
+# what is the max runs scored on overall career?
+max(mydata$Runs)
+
+# filter for Indian Batsmen
+filter(mydata, Country == "INDIA" )
+
+# filter for Indian Batmen whose ODI debut was after 2000
+filter(mydata, Country == "INDIA", Start_Year > 2000 )
+
+#by country avg run and avg avg
+summ <- mydata %>%
+select (Runs, Ave) %>%
+group_by(mydata$Country) %>%
+summarise(Runs = mean(Runs), Ave = mean(Ave))
+
+
+
+#get players by country who scored the maximum runs
+mydata.agg <- aggregate(Runs ~ Country, mydata, max)
+# then simply merge with the original
+mydata.Runs = merge(mydata.agg, mydata)
+# sort data by runs
+mydata.Runs[order(-mydata.Runs$Runs),]
+
+#get the player from India who scored the highest runs
+filter(merge(mydata.agg,mydata), Country == "INDIA")
+# Sachin Tendulkar
+
+#get players by country who has highest avg
+mydata.agg <- aggregate(Ave ~ Country, mydata, max)
+# then simply merge with the original
+mydata.Ave = merge(mydata.agg, mydata)
+# sort data by Ave
+mydata.Ave[order(-mydata.Ave$Ave),]
+#get the player from India who scored the highest runs
+filter(merge(mydata.agg,mydata), Country == "INDIA")
+#Virat kohli
+
+#get players by country who has highest SR
+mydata.agg <- aggregate(SR ~ Country, mydata, max)
+# then simply merge with the original
+mydata.SR = merge(mydata.agg, mydata)
+# sort data by SR
+mydata.SR[order(-mydata.SR$SR),]
+#get the player from India who scored the highest runs
+filter(merge(mydata.agg,mydata), Country == "INDIA")
+# V Sehwag
+
+#get players by country who has highest NO
+mydata.agg <- aggregate(NO ~ Country, mydata, max)
+# then simply merge with the original
+mydata.NO = merge(mydata.agg, mydata)
+# sort data by NO
+mydata.NO[order(-mydata.NO$NO),]
+#get the player from India who scored the highest runs
+filter(merge(mydata.agg,mydata), Country == "INDIA")
+# MS Dhoni
+
+
+# How do we do decide who is most valuable player for India?
+# Mat, Runs, NO, Avg, SR
+
+#rank based on Mat
+mydata$rank_mat = rank(-mydata$Mat)
+#Order by rank
+mydata[order(mydata$rank_mat),]
+
+#rank based on runs
+mydata$rank_runs = rank(-mydata$Runs)
+#Order by rank
+mydata[order(mydata$rank_runs),]
+
+#rank based on NO
+mydata$rank_no = rank(-mydata$NO)
+#Order by rank
+mydata[order(mydata$rank_no),]
+
+#rank based on Ave
+mydata$rank_ave = rank(-mydata$Ave)
+#Order by rank
+mydata[order(mydata$rank_ave),]
+
+
+#rank based on SR
+mydata$rank_sr = rank(-mydata$SR)
+#Order by rank
+mydata[order(mydata$rank_sr),]
+
+
+#creating ranks of ranks
+mydata$rank_of_ranks = rank(mydata$rank_mat + mydata$rank_runs + mydata$rank_ave + mydata$rank_sr + mydata$rank_no)
+mydata[order(mydata$rank_of_ranks),]
+
+# most valuable players by countries
+mydata.mvp <- aggregate(rank_of_ranks ~ Country, mydata, min)
+# then simply merge with the original
+mydata.mvp1 = merge(mydata.mvp, mydata)
+# sort data by ranks of ranks
+mydata.mvp1[order(mydata.mvp1$rank_of_ranks),]
